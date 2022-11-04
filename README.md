@@ -56,6 +56,7 @@ ip link set dev INTERFACE_NAME xdpgeneric off
 ```
 
 ```
+rm -f /sys/fs/bpf/xdp_drop_all
 bpftool net detach xdpgeneric dev INTERFACE_NAME
 ```
 
