@@ -1,12 +1,12 @@
 # eBPF
-## 1. Examples
+## Examples
 ## 1. Drop All Packets
 To run a simple example that would drop all incoming packets follow the steps:
 1. Compile the program
 ```
 ./compile_xdp examples/xdp_drop_all.c
 ```
-1. To investigate the built `xdp_drop_all.o` run the following commands
+2. To investigate the built `xdp_drop_all.o` run the following commands
 ```
 llvm-objdump -h examples/xdp_drop_all.o
 ```
@@ -67,10 +67,10 @@ cat /sys/kernel/debug/tracing/trace_pipe
 ```
 ip link set dev INTERFACE_NAME xdpgeneric off
 ```
-## 2. Resources
+## Resources
 * [XDP-Tutorial](https://github.com/xdp-project/xdp-tutorial)
 * [Get started with XDP-Red Hat](https://developers.redhat.com/blog/2021/04/01/get-started-with-xdp)
 
 
-## 3. eBPF Dependencies
+## eBPF Dependencies
 To install the eBPF dependencies follow the following [README](https://github.com/xdp-project/xdp-tutorial/blob/master/setup_dependencies.org)
