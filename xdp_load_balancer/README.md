@@ -4,7 +4,7 @@
 To run a simple example that would drop all incoming packets follow the steps:
 1. Compile the program
 ```
-./compile_xdp examples/xdp_drop_all.c
+clang -O2 -g -target bpf -c examples/xdp_drop_all.c -o examples/xdp_drop_all.o 
 ```
 2. To investigate the built `xdp_drop_all.o` run the following commands
 ```
@@ -53,7 +53,7 @@ bpftool net detach xdpgeneric dev INTERFACE_NAME
 To print the packets that passes through a specific interface follow the steps:
 1. Compile the program
 ```
-./compile_xdp examples/xdp_print_packets.c
+clang -O2 -g -target bpf -c examples/xdp_print_packets.c -o examples/xdp_print_packets.o 
 ```
 2. Load the xdp program to the wanted interface
 ```
