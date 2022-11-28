@@ -74,3 +74,8 @@ ip link set dev INTERFACE_NAME xdpgeneric off
 
 ## eBPF Dependencies
 To install the eBPF dependencies follow the following [README](https://github.com/xdp-project/xdp-tutorial/blob/master/setup_dependencies.org)
+
+**Add libbpf-dev tools**
+```
+sudo apt install libbpf-dev
+```
