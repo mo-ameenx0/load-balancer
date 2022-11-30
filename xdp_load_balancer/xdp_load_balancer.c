@@ -16,20 +16,20 @@ int xdp_load_balancer(struct xdp_md *ctx)
     // Handle data as an ethernet frame header
     struct ethhdr *eth = data;
 
-    // Check frame header size
+    // Check frame size
     if (data + sizeof(struct ethhdr) > data_end)
         return XDP_ABORTED;
 
-    // Check protocol
+    // Check protocol only accept IP
     if (bpf_ntohs(eth->h_proto) != ETH_P_IP)
         return XDP_PASS;
 
-    // Check packet header size
+    // Check packet size
     struct iphdr *iph = data + sizeof(struct ethhdr);
     if (data + sizeof(struct ethhdr) + sizeof(struct iphdr) > data_end)
         return XDP_ABORTED;
 
-    // Check protocol
+    // Check protocol only accept TCP
     if (iph->protocol != IPPROTO_TCP)
         return XDP_PASS;
 
