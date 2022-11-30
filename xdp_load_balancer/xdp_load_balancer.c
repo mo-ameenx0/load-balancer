@@ -39,16 +39,31 @@ int xdp_load_balancer(struct xdp_md *ctx)
     {
         bpf_printk("From Client");
         iph->daddr = IP_ADDRESS(BACKEND_A);
-        eth->h_dest[5] = BACKEND_A;
+        eth->h_dest[0] = 0x52;
+        eth->h_dest[1] = 0x54;
+        eth->h_dest[2] = 0x00;
+        eth->h_dest[3] = 0x63;
+        eth->h_dest[4] = 0xc4;
+        eth->h_dest[5] = 0x90;
     }
     else
     {
         bpf_printk("From Backend");
         iph->daddr = IP_ADDRESS(CLIENT);
-        eth->h_dest[5] = CLIENT;
+        eth->h_dest[0] = 0x52;
+        eth->h_dest[1] = 0x54;
+        eth->h_dest[2] = 0x00;
+        eth->h_dest[3] = 0xc1;
+        eth->h_dest[4] = 0xeb;
+        eth->h_dest[5] = 0x08;
     }
     iph->saddr = IP_ADDRESS(LB);
-    eth->h_source[5] = LB;
+    eth->h_source[0] = 0x52;
+    eth->h_source[1] = 0x54;
+    eth->h_source[2] = 0x00;
+    eth->h_source[3] = 0x46;
+    eth->h_source[4] = 0x3e;
+    eth->h_source[5] = 0x5a;
 
     iph->check = iph_csum(iph);
 

@@ -1,4 +1,4 @@
-INTERFACE_DEVICE = 
+INTERFACE_DEVICE = virbr1
 
 TARGET = xdp_load_balancer
 
