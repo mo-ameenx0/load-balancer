@@ -68,6 +68,7 @@ cat /sys/kernel/debug/tracing/trace_pipe
 ip link set dev INTERFACE_NAME xdpgeneric off
 ```
 ## Resources
+* [Load-Balancer-From-Scratch](https://github.com/lizrice/lb-from-scratch)
 * [XDP-Tutorial](https://github.com/xdp-project/xdp-tutorial)
 * [Get started with XDP-Red Hat](https://developers.redhat.com/blog/2021/04/01/get-started-with-xdp)
 
