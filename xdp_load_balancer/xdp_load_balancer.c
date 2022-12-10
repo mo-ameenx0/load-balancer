@@ -1,9 +1,22 @@
 #include "xdp_load_balancer.h"
 
 #define IP_ADDRESS(x) (unsigned int)(192 + (168 << 8) + (100 << 16) + (x << 24))
-#define BACKEND_A 4
-#define CLIENT 6
+#define CLIENT 2
 #define LB 1
+
+// Every map block is of size 8
+struct flags {
+    unsigned char vm_mac[6];    //size 6 bytes
+    unsigned char is_ready;     //size 1 byte
+	__be32 vm_ip;               //size 4 bytes
+};
+
+struct bpf_map_def SEC("maps") xdp_lb_map = {
+	.type        = BPF_MAP_TYPE_ARRAY,
+	.key_size    = sizeof(__u32),
+	.value_size  = sizeof(struct flags),
+	.max_entries = 1,
+};
 
 SEC("xdp_lb")
 int xdp_load_balancer(struct xdp_md *ctx)
@@ -32,31 +45,39 @@ int xdp_load_balancer(struct xdp_md *ctx)
     // Check protocol only accept TCP
     if (iph->protocol != IPPROTO_TCP)
         return XDP_PASS;
-
-    bpf_printk("Got TCP packet from %x", iph->daddr);
+    
+    __u32 key = 0;
+	struct flags *rec = bpf_map_lookup_elem(&xdp_lb_map, &key);
+	if (!rec){
+        bpf_printk("Failed to read the map");
+        return XDP_PASS;
+    }
 
     if (iph->saddr == IP_ADDRESS(CLIENT))
     {
-        bpf_printk("From Client");
-        iph->daddr = IP_ADDRESS(BACKEND_A);
-        eth->h_dest[0] = 0x52;
-        eth->h_dest[1] = 0x54;
-        eth->h_dest[2] = 0x00;
-        eth->h_dest[3] = 0x63;
-        eth->h_dest[4] = 0xc4;
-        eth->h_dest[5] = 0x90;
+        iph->daddr = rec->vm_ip;
+        for (int i = 0; i < sizeof(eth->h_dest); i++){
+            eth->h_dest[i] = rec->vm_mac[i];
+            bpf_printk("%x", eth->h_dest[i]);
+        }
+        bpf_printk("Got TCP packet from %x", rec->vm_ip);
+
     }
     else
     {
+        // The client is hardcoded
         bpf_printk("From Backend");
         iph->daddr = IP_ADDRESS(CLIENT);
         eth->h_dest[0] = 0x52;
         eth->h_dest[1] = 0x54;
         eth->h_dest[2] = 0x00;
-        eth->h_dest[3] = 0xc1;
-        eth->h_dest[4] = 0xeb;
-        eth->h_dest[5] = 0x08;
+        eth->h_dest[3] = 0xd0;
+        eth->h_dest[4] = 0x3e;
+        eth->h_dest[5] = 0xab;
+
+        rec->is_ready = 'R';
     }
+    // The load balancer interface is hardcoded
     iph->saddr = IP_ADDRESS(LB);
     eth->h_source[0] = 0x52;
     eth->h_source[1] = 0x54;
