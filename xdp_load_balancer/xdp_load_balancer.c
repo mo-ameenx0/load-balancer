@@ -1,7 +1,7 @@
 #include "xdp_load_balancer.h"
 
-#define IP_ADDRESS(x) (unsigned int)(192 + (168 << 8) + (100 << 16) + (x << 24))
-#define CLIENT 2
+#define IP_ADDRESS(x) (unsigned int)(192 + (168 << 8) + (200 << 16) + (x << 24))
+#define CLIENT 184
 #define LB 1
 
 // Every map block is of size 8
@@ -17,6 +17,17 @@ struct bpf_map_def SEC("maps") xdp_lb_map = {
 	.value_size  = sizeof(struct flags),
 	.max_entries = 1,
 };
+
+/*
+    xdp_lb_map structure:
+    block 1: 00 00 00 00 00 00   00      00
+             {     vm_mac    } {flag} {extend}
+    block 2: 00 00 00 00    
+             {  vm_ip  }
+
+    {extend} is added by the program to complete the block size which is 8 bytes
+*/
+
 
 SEC("xdp_lb")
 int xdp_load_balancer(struct xdp_md *ctx)
@@ -71,9 +82,9 @@ int xdp_load_balancer(struct xdp_md *ctx)
         eth->h_dest[0] = 0x52;
         eth->h_dest[1] = 0x54;
         eth->h_dest[2] = 0x00;
-        eth->h_dest[3] = 0xd0;
-        eth->h_dest[4] = 0x3e;
-        eth->h_dest[5] = 0xab;
+        eth->h_dest[3] = 0x9d;
+        eth->h_dest[4] = 0xd0;
+        eth->h_dest[5] = 0xa6;
 
         rec->is_ready = 'R';
     }
@@ -82,9 +93,9 @@ int xdp_load_balancer(struct xdp_md *ctx)
     eth->h_source[0] = 0x52;
     eth->h_source[1] = 0x54;
     eth->h_source[2] = 0x00;
-    eth->h_source[3] = 0x46;
-    eth->h_source[4] = 0x3e;
-    eth->h_source[5] = 0x5a;
+    eth->h_source[3] = 0x72;
+    eth->h_source[4] = 0x76;
+    eth->h_source[5] = 0xce;
 
     iph->check = iph_csum(iph);
 
